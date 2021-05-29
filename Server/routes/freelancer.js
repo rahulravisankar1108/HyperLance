@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { check, validationResult } = require("express-validator/check");
 const Freelancer = require('../models/Freelancer');
+const Job = require('../models/Freelancer');
 const auth = require('../middleware/auth');
 
 router.post(
@@ -116,11 +117,25 @@ router.get('/viewAllProfile',auth, async (req, res) => {
     }
 });
 
-router.post('jobs/apply', auth, async(req, res) => {
+router.post('/jobs/apply/:jobId', auth, async(req, res) => {
     try {
-        const apply
+        const applyJob = await Freelancer.updateOne({postedBy:req.user._id}, {"$push" : {appliedJobs:req.params.jobId}}, {new:true, safe:true});
+        const notifyRecruiter = await Job.findByIdAndUpdate(req.params.jobId, {"$push" : {applied:req.user._id}}, {new:true, safe:true});
+        if(applyJob && notifyRecruiter) {
+            return res.status(200).json({
+                res:true,
+                message:"Applied!",
+            });
+        }
+        return res.status(404).json({
+            res:false,
+            message:`No user found!`,
+        });
     } catch (err) {
-        
+        return res.status(500).json({
+            res:false,
+            message:`Check your query ${err}`,
+        });
     }
 })
 module.exports = router;

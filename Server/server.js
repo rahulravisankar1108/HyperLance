@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const cors = require('cors');
 const passport = require("passport");
 const path = require("path");
 require('dotenv/config');
@@ -10,7 +11,7 @@ const job = require('./routes/job');
 const freelancer = require('./routes/freelancer');
 
 const app = express();
-
+app.use(cors());
 // Bodyparser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

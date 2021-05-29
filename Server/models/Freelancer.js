@@ -38,6 +38,10 @@ const freelancerSchema = new schema({
         type: Number,
         default:0.00,
     },
+    appliedJobs: [{
+        type: schema.Types.ObjectId,
+        ref:'jobs',
+    }],
     dailyRate: {
         type: Number,
         default:0.00,
@@ -46,7 +50,10 @@ const freelancerSchema = new schema({
         type: Date,
         default:Date.now,
     },
-        
+    notification: [{
+        type: String,
+    }],
+
 });
 
 module.exports = Freelancer = mongoose.model("freelancer", freelancerSchema);

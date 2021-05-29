@@ -38,6 +38,6 @@ const JobSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'users',
     },
-});
+}); 
 
 module.exports = Job = mongoose.model("jobs", JobSchema);

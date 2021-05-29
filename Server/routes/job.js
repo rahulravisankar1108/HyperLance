@@ -1,13 +1,32 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
+const {check, validationResult} = require('express-validator/check');
 
 const Job = require('../models/Job');
 const auth = require('../middleware/auth');
-const { compareSync } = require('bcryptjs');
-// const jobValidator = require('')
 
-router.post('/add', auth, async(req,res) => {
+
+router.post('/add', auth, [
+    check("category", "Category is required")
+      .not()
+      .isEmpty(),
+    check("description", "Description is required ")
+      .not()
+      .isEmpty(),
+    check("country", "Country is required")
+      .not()
+      .isEmpty(),
+    check("budget", "Budget is required")
+      .not()
+      .isEmpty(),
+    check("period", "Period is required")
+      .not()
+      .isEmpty()
+  ], async(req,res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors });
+    }
     try{
         const {category, description, country,
         budget, period} = req.body;
@@ -38,7 +57,7 @@ router.post('/add', auth, async(req,res) => {
 
 router.get('/viewAll',auth, async(req,res) => {
     try {
-        const getAllJobs = await Job.find();
+        const getAllJobs = await Job.find().populate('postedBy', 'name email');
         if(getAllJobs){
             res.status(200).json({
                 allJobs : getAllJobs,
@@ -61,7 +80,7 @@ router.get('/viewAll',auth, async(req,res) => {
 
 router.get('/myView',auth, async(req,res) => {
     try {
-        const getJobs = await Job.find({postedBy:req.user._id});
+        const getJobs = await Job.find({postedBy:req.user._id}).populate('postedBy', 'name email');
         if(getJobs){
             res.status(200).json({
                 Jobs : getJobs,
@@ -105,5 +124,12 @@ router.get('/:jobId',auth, async(req,res) => {
     }
 });
 
+router.post('/select', auth, async(req,res) => {
+    try {
+        
+    } catch (err) {
+        
+    }
+})
 
 module.exports = router;

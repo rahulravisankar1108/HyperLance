@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
+require('dotenv/config');
 // Load input validation
 const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
@@ -65,7 +65,7 @@ router.post("/login", (req, res) => {
   const role = req.body.role;
 
   // Find user by email
-  User.findOne({ email }).then((user) => {
+  User.findOne({email}).then((user) => {
     // Check if user exists
     if (!user) {
       return res.status(404).json({ emailnotfound: "Email not found" });
@@ -76,15 +76,10 @@ router.post("/login", (req, res) => {
       if (isMatch) {
         // User matched
         // Create JWT Payload
-        const payload = {
-          id: user.id,
-          name: user.name,
-          role:user.role,
-        };
 
         // Sign token
         jwt.sign(
-          {_id:user.id},
+          {_id : user.id},
           process.env.SECRET,
           {
             expiresIn: 31556926, // 1 year in seconds
