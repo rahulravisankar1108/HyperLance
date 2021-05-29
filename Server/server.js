@@ -7,6 +7,7 @@ require('dotenv/config');
 
 const users = require("./routes/users");
 const job = require('./routes/job');
+const freelancer = require('./routes/freelancer');
 
 const app = express();
 
@@ -19,7 +20,7 @@ const db = process.env.mongoURI;
 
 // Connect to MongoDB
 mongoose
-  .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify:false })
   .then(() => console.log("MongoDB successfully connected"))
   .catch((err) => console.log(err));
 
@@ -32,6 +33,7 @@ require("./config/passport")(passport);
 // Routes
 app.use("/api/users", users);
 app.use("/api/jobs",job);
+app.use("/api/freelancer", freelancer);
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === "production") {
