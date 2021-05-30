@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import {Link} from 'react-router-dom';
-import axios from 'axios';
+import { Link } from "react-router-dom";
+import axios from "axios";
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -8,26 +8,36 @@ class Login extends Component {
       email: "",
       password: "",
       error: false,
+      tokenError: false
     };
   }
   handleLogin = () => {
-    const userData = {
-      email:this.state.email,
-      password:this.state.password,
-      role:'freelancer',
+    const userEmail = this.state.email;
+    const userPassword = this.state.password;
+    if (userEmail.length === 0 || userPassword.length === 0) {
+      this.setState({ error: true });
+      return false;
     }
+    this.setState({ error: false });
+    const userData = {
+      email: this.state.email,
+      password: this.state.password,
+      role: "freelancer"
+    };
     // this.props.loginUser(userData);
-    axios.post('/api/users/login', userData)
-    .then(response => {
-      console.log(response.data);
-      alert('login successful!');
-      this.props.history.push('/dashboard');
-    })
-    .catch(err => {
-      console.log(err);
-    });
-
-  }
+    this.setState({ tokenError: false });
+    axios
+      .post("/api/users/login", userData)
+      .then(response => {
+        console.log(response.data.token);
+        alert("login successful!");
+        this.props.history.push("/dashboard");
+      })
+      .catch(err => {
+        console.log(err);
+        return this.setState({ tokenError: true });
+      });
+  };
   render() {
     return (
       <form>
@@ -60,17 +70,34 @@ class Login extends Component {
               type="checkbox"
               className="custom-control-input"
               id="customCheck1"
-            />
+            />{" "}
             <label className="custom-control-label" htmlFor="customCheck1">
               Remember me
             </label>
           </div>
         </div>
-        <button type="button" className="btn btn-dark btn-lg btn-block" onClick={this.handleLogin}>
+        <div>
+          {" "}
+          {this.state.error === true ? (
+            <span style={{ color: `red` }}>Please fill all the fields.</span>
+          ) : (
+            ""
+          )}{" "}
+          {this.state.tokenError === true ? (
+            <span style={{ color: `red` }}>Invalid credentials.</span>
+          ) : (
+            ""
+          )}
+        </div>
+        <button
+          type="button"
+          className="btn btn-dark btn-lg btn-block"
+          onClick={this.handleLogin}
+        >
           Sign in
         </button>
         <p className="text-right">
-          Don't have an Account? 
+          Don't have an Account?
           <a href="/register">Sign Up</a>
         </p>
       </form>
@@ -78,6 +105,4 @@ class Login extends Component {
   }
 }
 
-
-export default Login
-
+export default Login;
