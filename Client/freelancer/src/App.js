@@ -13,6 +13,8 @@ import PrivateRoute from "./components/private-route/PrivateRoute";
 import Dashboard from "./components/dashboard/Dashboard";
 import AllJobs from "./components/dashboard/AllJobs";
 import AppliedJobs from './components/dashboard/AppliedJobs';
+import EditProfile from './components/dashboard/EditProfile';
+import ViewProfile from './components/dashboard/ViewProfile';
 // Check for token to keep user logged in
 if (localStorage.jwtToken) {
   // Set auth token header auth
@@ -50,6 +52,8 @@ function App() {
             <PrivateRoute exact path="/dashboard" component={Dashboard} />
             <PrivateRoute exact path="/viewAllJobs" component={AllJobs} />
             <PrivateRoute exact path="/appliedJobs" component={AppliedJobs} />
+            <PrivateRoute exact path="/viewProfile" component={ViewProfile} />
+            <PrivateRoute exact path="/editProfile" component={EditProfile} />
           </Switch>
         </div>
       </Router>

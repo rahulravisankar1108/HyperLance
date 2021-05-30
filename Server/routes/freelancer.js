@@ -82,9 +82,9 @@ router.post(
       }
     }
 );
-router.get('/profile',auth, async (req, res) => {
+router.get('/view-profile',auth, async (req, res) => {
     try {
-        const userProfile = await Freelancer.findOne({postedBy:req.user._id});
+        const userProfile = await Freelancer.findOne({postedBy:req.user._id}).populate('postedBy', 'name email');
         if(userProfile) {
             return res.status(200).json({
                 userProfile : userProfile,

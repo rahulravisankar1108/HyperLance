@@ -14,10 +14,20 @@ class Dashboard extends Component {
   handleAppliedJob = () => {
     this.props.history.push('/appliedJobs');
   }
+  handleAppliedJob = () => {
+    window.location.href="/appliedJobs";
+    // props.history.push('/appliedJobs');
+  }
+  handleProfile = () => {
+    window.location.href="/viewProfile";
+    // props.history.push('/appliedJobs');
+  }
   
   render() {
     return (
       <div className="container">
+        <Button onClick = {this.handleProfile}>View Profile</Button>
+        <Button onClick = {this.handleAppliedJob}>Applied Jobs</Button>
         <AllJobs />
       </div>
     );

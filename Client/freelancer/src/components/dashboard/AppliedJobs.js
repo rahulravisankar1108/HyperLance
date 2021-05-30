@@ -29,8 +29,8 @@ const AppliedJobs = () => {
             {AppliedJob.map((job, index) => {
                 const category = job.category;
                 return(
-                    <div className="col d-flex justify-content-center">
-                        <Card style={{width:"30%", margin:"0 auto"}}>
+                    <div className="col d-flex justify-content-center" style={{display:"flex"}}>
+                        <Card style={{width:"30%", margin:"0 auto", marginBottom:"20px"}}  className="shadow p-3 mb-5 bg-white rounded">
                             <Card.Title  style={{textAlign:"center"}}>
                                 Job {index + 1}
                                 <div> Employer : {job.name}</div>

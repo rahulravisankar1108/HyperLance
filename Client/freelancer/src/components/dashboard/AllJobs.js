@@ -63,7 +63,6 @@ const AllJobs = (props) => {
                     </Card>
                 );
             })}
-            <Button onClick = {() => {handleAppliedJob()}}>Applied Jobs</Button>
         </div>
         
     );

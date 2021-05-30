@@ -4,8 +4,8 @@ import Card from 'react-bootstrap/Card';
 import { Link } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 
-const ApplyJobs = () => {
-    const [ ApplyJob, setApplyJob] = useState({
+const EditProfile = () => {
+    const [ Profile, setProfile] = useState({
         bio:'',
         jobTitle:'',
         skills:'',
@@ -27,16 +27,16 @@ const ApplyJobs = () => {
         experience,
         hourlyRate,
         dailyRate,
-    } = ApplyJob;
+    } = Profile;
     const onChange = (e) =>
-    setApplyJob({ ...ApplyJob, [e.target.name]: e.target.value });
+    setProfile({ ...Profile, [e.target.name]: e.target.value });
     const onSubmit = (e) => {
         e.preventDefault();
-        axios.post('/api/jobs/add', ApplyJob)
+        axios.post('/api/freelancer/profile/add', Profile)
         .then(response => {
             if(response.data){
-                alert('job added successfully!');
-                window.location.href="/dashboard";
+                alert('profile added successfully!');
+                window.location.href="/viewProfile";
             }
         })
         .catch(err => {
@@ -89,7 +89,7 @@ const ApplyJobs = () => {
         </div>
         <div className="form-group">
           <input
-            type="number"
+            type="text"
             placeholder="Enter location"
             name="location"
             value={location}
@@ -168,4 +168,4 @@ const ApplyJobs = () => {
         
     );
 }
-export default ApplyJobs
+export default EditProfile
