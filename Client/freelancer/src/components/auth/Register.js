@@ -1,95 +1,168 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import '../../App.css';
-import axios from 'axios';
+import { Link, withRouter } from "react-router-dom";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { registerUser } from "../../actions/authActions";
+import classnames from "classnames";
 
-class SignUp extends Component {
-    constructor() {
-        super();
-        this.state = {
-          name: "",
-          email: "",
-          password: "",
-          password2: "",
-          errors: {},
-        };
-      }
+class Register extends Component {
+  constructor() {
+    super();
+    this.state = {
+      name: "",
+      email: "",
+      password: "",
+      password2: "",
+      errors: {},
+    };
+  }
 
-      onChange = (e) => {
-        this.setState({ [e.target.name]: e.target.value });
-      };
-    
-      onSubmit = (e) => {
-        e.preventDefault();
-        if(this.isFormValid() === true) {
-            const newUser = {
-                name: this.state.name,
-                email: this.state.email,
-                password: this.state.password,
-                password2: this.state.password2,
-                role:'freelancer',
-            }; 
-            axios.post('/api/users/register', newUser)
-            .then(response => {
-              console.log(response.data);
-              alert('login successful!');
-              this.props.history.push('/dashboard');
-            })
-            .catch(err => {
-              console.log(err);
-            });
-        }
-      };
-
-      isFormValid = () => {
-        const userEmail = this.state.email;
-        const userName = this.state.name;
-        const userPassword = this.state.password;
-        const userPassword2 = this.state.password2;
-        if (userEmail.length === 0 || userPassword.length === 0 || userName.length === 0 || userPassword2.length === 0) {
-          this.setState({ errors : "please fill all the fields." });
-          return false;
-        } else {
-          this.setState({ error: false, formValidation: true });
-          return true;
-        }
-      };
-
-    render() {
-        const { errors } = this.state;
-        return (
-            <form noValidate onSubmit={this.onSubmit}>
-                <h3>Register</h3>
-
-                <div className="form-group">
-                    <label>Name</label>
-                    <span className="red-text">{errors.name}</span>
-                    <input type="text" onChange={this.onChange} value={this.state.name} error={errors.name} className="form-control" placeholder="First name" />
-                </div>
-                <div className="form-group">
-                    <label>Email</label>
-                    <span className="red-text">{errors.email}</span>
-                    <input type="email" onChange={this.onChange} value={this.state.email} error={errors.email}  className="form-control" placeholder="Enter email" />
-                </div>
-                <div className="form-group">
-                    <label>Password</label>
-                    <span className="red-text">{errors.password}</span>
-                    <input type="password" onChange={this.onChange} value={this.state.password} error={errors.password}  className="form-control" placeholder="Enter password" />
-                </div>
-                <div className="form-group">
-                    <label>Confirm Password</label>
-                    <span className="red-text">{errors.password2}</span>
-                    <input type="password" onChange={this.onChange} value={this.state.password2} error={errors.password2}  className="form-control" placeholder="Enter confirm password" />
-                </div>
-                <br></br>
-                <button type="submit" className="btn btn-dark btn-lg btn-block">Register</button>
-                <p className="my-1">
-                    Already have an Account? <Link to="/login">Sign In</Link>
-                </p>
-            </form>
-        );
+  componentDidMount() {
+    // If logged in and user navigates to Register page, should redirect them to dashboard
+    if (this.props.auth.isAuthenticated) {
+      this.props.history.push("/dashboard");
     }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.errors) {
+      this.setState({
+        errors: nextProps.errors,
+      });
+    }
+  }
+
+  onChange = (e) => {
+    this.setState({ [e.target.id]: e.target.value });
+  };
+
+  onSubmit = (e) => {
+    e.preventDefault();
+
+    const newUser = {
+      name: this.state.name,
+      email: this.state.email,
+      password: this.state.password,
+      password2: this.state.password2,
+      role:'employer'
+    };
+
+    this.props.registerUser(newUser, this.props.history);
+  };
+
+  render() {
+    const { errors } = this.state;
+
+    return (
+      <div className="container">
+        <div className="row">
+          <div className="col s8 offset-s2">
+            <Link to="/" className="btn-flat waves-effect">
+              <i className="material-icons left">keyboard_backspace</i> Back to
+              home
+            </Link>
+
+            <div className="col s12" style={{ paddingLeft: "11.250px" }}>
+              <h4>
+                <b>Register</b> below
+              </h4>
+              <p className="grey-text text-darken-1">
+                Already have an account? <Link to="/login">Log in</Link>
+              </p>
+            </div>
+
+            <form noValidate onSubmit={this.onSubmit}>
+              <div className="input-field col s12">
+                <input
+                  onChange={this.onChange}
+                  value={this.state.name}
+                  error={errors.name}
+                  id="name"
+                  type="text"
+                  className={classnames("", {
+                    invalid: errors.name,
+                  })}
+                />
+                <label htmlFor="name">Name</label>
+                <span className="red-text">{errors.name}</span>
+              </div>
+
+              <div className="input-field col s12">
+                <input
+                  onChange={this.onChange}
+                  value={this.state.email}
+                  error={errors.email}
+                  id="email"
+                  type="email"
+                  className={classnames("", {
+                    invalid: errors.email,
+                  })}
+                />
+                <label htmlFor="email">Email</label>
+                <span className="red-text">{errors.email}</span>
+              </div>
+            
+              <div className="input-field col s12">
+                <input
+                  onChange={this.onChange}
+                  value={this.state.password}
+                  error={errors.password}
+                  id="password"
+                  type="password"
+                  className={classnames("", {
+                    invalid: errors.password,
+                  })}
+                />
+                <label htmlFor="password">Password</label>
+                <span className="red-text">{errors.password}</span>
+              </div>
+
+              <div className="input-field col s12">
+                <input
+                  onChange={this.onChange}
+                  value={this.state.password2}
+                  error={errors.password2}
+                  id="password2"
+                  type="password"
+                  className={classnames("", {
+                    invalid: errors.password2,
+                  })}
+                />
+                <label htmlFor="password2">Confirm Password</label>
+                <span className="red-text">{errors.password2}</span>
+              </div>
+
+              <div className="col s12" style={{ paddingLeft: "11.250px" }}>
+                <button
+                  style={{
+                    width: "150px",
+                    borderRadius: "3px",
+                    letterSpacing: "1.5px",
+                    marginTop: "1rem",
+                  }}
+                  type="submit"
+                  className="btn btn-large waves-effect waves-light hoverable blue accent-3"
+                >
+                  Sign up
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
-export default SignUp
+Register.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired,
+};
 
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  errors: state.errors,
+});
+
+export default connect(mapStateToProps, { registerUser })(withRouter(Register));

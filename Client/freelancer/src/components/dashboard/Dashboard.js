@@ -3,25 +3,22 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { logoutUser } from "../../actions/authActions";
 import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import AllJobs from './AllJobs';
 class Dashboard extends Component {
   onLogoutClick = (e) => {
     e.preventDefault();
     this.props.logoutUser();
   };
 
-  viewJobs = () => {
-    this.props.history.push('/viewJobs');
-  }
-  viewAllJobs = () => {
-    this.props.history.push('/viewAllJobs');
-    // window.location.href='/allJobs';
+  handleAppliedJob = () => {
+    this.props.history.push('/appliedJobs');
   }
   
   render() {
     return (
       <div className="container">
-        <Button onClick={() => this.viewJobs()}>View Jobs</Button>
-        <Button onClick={() => this.viewAllJobs()}>View All jobs</Button>
+        <AllJobs />
       </div>
     );
   }

@@ -1,9 +1,25 @@
 import axios from 'axios';
 import {React, useEffect, useState} from 'react'
-import Card from 'react-bootstrap/Card'
-import Button from 'react-bootstrap/Button'
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
 
-const AllJobs = () => {
+const AllJobs = (props) => {
+    const handleChange = (jobId) => {
+        axios.post('/api/freelancer/jobs/apply/'+jobId)
+        .then(response => {
+            console.log(response);
+            alert('Applied successful!');
+            window.location.href('')
+            props.history.push('/appliedJobs');
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+    const handleAppliedJob = () => {
+        window.location.href="/appliedJobs";
+        // props.history.push('/appliedJobs');
+      }
     const [ AllJob, setAllJob] = useState([]);
     useEffect(() => {
         var config = {
@@ -42,11 +58,12 @@ const AllJobs = () => {
                             <div>{job.country}</div>
                             <div>{job.budget}</div>
                             <div>{job.period}</div>
-                        {/* <Button variant="primary"></Button> */}
+                        <Button variant="primary" onClick={() => handleChange(job._id)}>Apply job</Button>
                         </Card.Body>
                     </Card>
                 );
             })}
+            <Button onClick = {() => {handleAppliedJob()}}>Applied Jobs</Button>
         </div>
         
     );

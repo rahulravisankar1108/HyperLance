@@ -42,6 +42,10 @@ const freelancerSchema = new schema({
         type: schema.Types.ObjectId,
         ref:'jobs',
     }],
+    selectedJobs : [{
+        type: schema.Types.ObjectId,
+        ref:'jobs',
+    }],
     dailyRate: {
         type: Number,
         default:0.00,

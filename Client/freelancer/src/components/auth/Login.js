@@ -1,108 +1,142 @@
-import React, { Component } from "react";
+ import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { loginUser } from "../../actions/authActions";
+import classnames from "classnames";
+
 class Login extends Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
       email: "",
       password: "",
-      error: false,
-      tokenError: false
+      role:"",
+      errors: {},
     };
   }
-  handleLogin = () => {
-    const userEmail = this.state.email;
-    const userPassword = this.state.password;
-    if (userEmail.length === 0 || userPassword.length === 0) {
-      this.setState({ error: true });
-      return false;
+
+  componentDidMount() {
+    // If logged in and user navigates to Login page, should redirect them to dashboard
+    if (this.props.auth.isAuthenticated) {
+      this.props.history.push("/dashboard");
     }
-    this.setState({ error: false });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.auth.isAuthenticated) {
+      this.props.history.push("/dashboard"); // push user to dashboard when they login
+    }
+    if (nextProps.errors) {
+      this.setState({
+        errors: nextProps.errors,
+      });
+    }
+  }
+
+  onChange = (e) => {
+    this.setState({ [e.target.id]: e.target.value });
+  };
+
+  onSubmit = (e) => {
+    e.preventDefault();
     const userData = {
       email: this.state.email,
       password: this.state.password,
-      role: "freelancer"
+      role:'freelancer',
     };
-    // this.props.loginUser(userData);
-    this.setState({ tokenError: false });
-    axios
-      .post("/api/users/login", userData)
-      .then(response => {
-        console.log(response.data.token);
-        alert("login successful!");
-        this.props.history.push("/dashboard");
-      })
-      .catch(err => {
-        console.log(err);
-        return this.setState({ tokenError: true });
-      });
+    this.props.loginUser(userData); // since we handle the redirect within our component, we don't need to pass in this.props.history as a parameter
   };
+
   render() {
+    const { errors } = this.state;
+
     return (
-      <form>
-        <h3>Log in</h3>
-        <div className="form-group">
-          <label>Email</label>
-          <input
-            type="email"
-            className="form-control"
-            placeholder="Enter email"
-            onChange={e => {
-              this.setState({ email: e.target.value });
-            }}
-          />
-        </div>
-        <div className="form-group">
-          <label>Password</label>
-          <input
-            type="password"
-            className="form-control"
-            placeholder="Enter password"
-            onChange={e => {
-              this.setState({ password: e.target.value });
-            }}
-          />
-        </div>
-        <div className="form-group">
-          <div className="custom-control custom-checkbox">
-            <input
-              type="checkbox"
-              className="custom-control-input"
-              id="customCheck1"
-            />{" "}
-            <label className="custom-control-label" htmlFor="customCheck1">
-              Remember me
-            </label>
+      <div className="container">
+        <div style={{ marginTop: "4rem" }} className="row">
+          <div className="col s8 offset-s2">
+            <Link to="/" className="btn-flat waves-effect">
+              <i className="material-icons left">keyboard_backspace</i> Back to
+              home
+            </Link>
+
+            <div className="col s12" style={{ paddingLeft: "11.250px" }}>
+              <h4>
+                <b>Login</b> below
+              </h4>
+              <p className="grey-text text-darken-1">
+                Don't have an account? <Link to="/register">Register</Link>
+              </p>
+            </div>
+
+            <form noValidate onSubmit={this.onSubmit}>
+              <div className="input-field col s12">
+                <input
+                  onChange={this.onChange}
+                  value={this.state.email}
+                  error={errors.email}
+                  id="email"
+                  type="email"
+                  className={classnames("", {
+                    invalid: errors.email || errors.emailnotfound,
+                  })}
+                />
+                <label htmlFor="email">Email</label>
+                <span className="red-text">
+                  {errors.email}
+                  {errors.emailnotfound}
+                </span>
+              </div>
+
+              <div className="input-field col s12">
+                <input
+                  onChange={this.onChange}
+                  value={this.state.password}
+                  error={errors.password}
+                  id="password"
+                  type="password"
+                  className={classnames("", {
+                    invalid: errors.password || errors.passwordincorrect,
+                  })}
+                />
+                <label htmlFor="password">Password</label>
+                <span className="red-text">
+                  {errors.password}
+                  {errors.passwordincorrect}
+                </span>
+              </div>
+
+              <div className="col s12" style={{ paddingLeft: "11.250px" }}>
+                <button
+                  style={{
+                    width: "150px",
+                    borderRadius: "3px",
+                    letterSpacing: "1.5px",
+                    marginTop: "1rem",
+                  }}
+                  type="submit"
+                  className="btn btn-large waves-effect waves-light hoverable blue accent-3"
+                >
+                  Login
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-        <div>
-          {" "}
-          {this.state.error === true ? (
-            <span style={{ color: `red` }}>Please fill all the fields.</span>
-          ) : (
-            ""
-          )}{" "}
-          {this.state.tokenError === true ? (
-            <span style={{ color: `red` }}>Invalid credentials.</span>
-          ) : (
-            ""
-          )}
-        </div>
-        <button
-          type="button"
-          className="btn btn-dark btn-lg btn-block"
-          onClick={this.handleLogin}
-        >
-          Sign in
-        </button>
-        <p className="text-right">
-          Don't have an Account?
-          <a href="/register">Sign Up</a>
-        </p>
-      </form>
+      </div>
     );
   }
 }
 
-export default Login;
+Login.propTypes = {
+  loginUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  errors: state.errors,
+});
+
+export default connect(mapStateToProps, { loginUser })(Login);

@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 
 const { check, validationResult } = require("express-validator/check");
 const Freelancer = require('../models/Freelancer');
-const Job = require('../models/Freelancer');
+const Job = require('../models/Job');
 const auth = require('../middleware/auth');
 
 router.post(
@@ -117,10 +118,39 @@ router.get('/viewAllProfile',auth, async (req, res) => {
     }
 });
 
+router.get('/viewAppliedJobs',auth, async(req,res) => {
+  try {
+      console.log(req.user._id);
+      const appliedJobs = await Freelancer.findOne({postedBy:req.user._id}).populate('appliedJobs', 'category description country budget period name email');
+
+      console.log(appliedJobs);
+      if(appliedJobs){
+          res.status(200).json({
+              appliedJobs : appliedJobs,
+              res:true,
+          });
+      }
+      else {
+          res.status(201).json({
+            appliedJobs : null,
+              res:false,
+          });
+      }
+  } catch (err) {
+      res.status(500).json({
+          Jobs : null,
+          res:false,
+      });
+  }
+});
+
 router.post('/jobs/apply/:jobId', auth, async(req, res) => {
     try {
-        const applyJob = await Freelancer.updateOne({postedBy:req.user._id}, {"$push" : {appliedJobs:req.params.jobId}}, {new:true, safe:true});
-        const notifyRecruiter = await Job.findByIdAndUpdate(req.params.jobId, {"$push" : {applied:req.user._id}}, {new:true, safe:true});
+        const { jobId } = req.params;
+        const applyJob = await Freelancer.updateOne({postedBy:req.user._id}, {"$push" : {appliedJobs:jobId}}, {new:true, safe:true});
+        const notifyRecruiter = await Job.findByIdAndUpdate(jobId, {"$push" : { applied: req.user._id }} , {new:true, safe:true});
+        console.log(notifyRecruiter);
+        
         if(applyJob && notifyRecruiter) {
             return res.status(200).json({
                 res:true,
@@ -137,5 +167,7 @@ router.post('/jobs/apply/:jobId', auth, async(req, res) => {
             message:`Check your query ${err}`,
         });
     }
-})
+});
+
+
 module.exports = router;

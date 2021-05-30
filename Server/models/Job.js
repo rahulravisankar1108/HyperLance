@@ -6,6 +6,14 @@ const JobSchema = new Schema({
         type : mongoose.Schema.Types.ObjectId,
         ref: 'users',
     },
+    name:{
+        type:String,
+        required: true,
+    },
+    email:{
+        type:String,
+        required: true,
+    },
     category : {
         type : String,
         required: true,
@@ -38,6 +46,10 @@ const JobSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'users',
     },
+    isAvailable: {
+        type: String,
+        default:true,
+    }
 }); 
 
 module.exports = Job = mongoose.model("jobs", JobSchema);

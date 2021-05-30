@@ -4,6 +4,7 @@ const {check, validationResult} = require('express-validator/check');
 
 const Job = require('../models/Job');
 const auth = require('../middleware/auth');
+const Freelancer = require('../models/Freelancer');
 
 
 router.post('/add', auth, [
@@ -37,6 +38,8 @@ router.post('/add', auth, [
             country : country,
             budget : budget,
             period : period,
+            name: req.user.name,
+            email: req.user.email,
         });
 
         await newJob.save();
@@ -124,11 +127,54 @@ router.get('/:jobId',auth, async(req,res) => {
     }
 });
 
-router.post('/select', auth, async(req,res) => {
+router.post('/viewApplied/:jobId', auth, async(req,res) => {
     try {
-        
+        const viewApplied = await Job.findById(req.params.jobId, {Applied:1}).populate('applied', 'name email');
+        if(viewApplied) {
+            return res.status(200).json({
+                res:true,
+                appliedUsers : viewApplied,
+            });
+        }
+        return res.status(201).json({
+            res:false,
+            appliedUsers : null,
+        });
     } catch (err) {
-        
+        return res.status(200).json({
+            res:false,
+            appliedUsers : `${err}`,
+        });
+    }
+})
+router.post('/select', auth, async(req,res) => {
+    const {userId, jobId } =req.body;
+    try {
+        const freelancer = await Freelancer.findById(userId);
+        const job = await Job.findById(jobId);
+        const selectFreelancer = await Job.findById(jobId, {"$push" : { selected : userId}}, {new:true, safe : true});
+        const notifyFreelancer = await Freelancer.findById(userId, {"$pull" : {appliedJobs : jobId}}, {new:true, safe : true});
+        const selectedFreelancer = await Freelancer.findById(userId, {"$push" : {selectedJobs : JobId}}, {new:true, safe : true})
+        const otherFreelancer = await Job.findById(jobId).populate('applied',"_id name email");
+        otherFreelancer.map((user) => {
+            Freelancer.findByIdAndUpdate(user._id, {"$push" : {notification: `Candidate ${freelancer.name} has been selected for the post that you have applied for ${job.description}`}});
+        });
+        const closeJob = await Job.findByIdAndUpdate(jobId, {$set : { isAvailable : false}}, {new:true, safe: true});
+        console.log(closeJob, selectFreelancer, selectedFreelancer, otherFreelancer);
+        if(otherFreelancer && selectFreelancer && notifyFreelancer && selectedFreelancer) {
+            return res.status(200).json({
+                res:true,
+                Job : closeJob,
+            });
+        }
+        return res.status(404).json({
+            res:false,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            res:false,
+            Error : `${err}`,
+        });
     }
 })
 
