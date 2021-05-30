@@ -64,7 +64,6 @@ const AllJobs = (props) => {
                 );
             })}
         </div>
-        
     );
 }
 export default AllJobs

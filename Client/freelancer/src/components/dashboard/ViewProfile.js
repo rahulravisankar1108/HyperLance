@@ -1,6 +1,8 @@
 import axios from 'axios';
 import {React, useEffect, useState} from 'react'
 import Card from 'react-bootstrap/Card';
+import CardColumns from 'react-bootstrap/CardColumns';
+
 import Button from 'react-bootstrap/Button';
 
 const ViewProfile = (props) => {
@@ -25,7 +27,7 @@ const ViewProfile = (props) => {
           .then(response => {
             const data = response.data;
             console.log(data.userProfile);
-            setProfileDetails(data.userProfile.userProfile);
+            setProfileDetails(data.userProfile);
             setLoading(true);
           })
           .catch(error => {
@@ -33,30 +35,36 @@ const ViewProfile = (props) => {
           });
     }, []);
 
-    if(Loading) {
+    if(Loading && ProfileDetails!== null) {
         return (
-            <div>
+            <>
                 <Button onClick = {() => {handleEditProfile()}}>Edit Profile</Button>
                 <Card style={{ width: "100%" }}>
-                    <Card.Title className="col d-flex justify-content-center">
-                        Profile Details
-                    </Card.Title>
-                    <Card.Header><div>{ProfileDetails.postedBy.name}</div></Card.Header>
-                    <Card.Body>
-                        <div>{ProfileDetails.postedBy.email}</div>
-                        <div>{ProfileDetails.bio}</div>
-                        <div>{ProfileDetails.jobTitle}</div>
-                        <div>{ProfileDetails.skills}</div>
-                        <div>{ProfileDetails.location}</div>
-                        <div>{ProfileDetails.education}</div>
-                        <div>{ProfileDetails.services}</div>
-                        <div>{ProfileDetails.experience}</div>
-                        <div>{ProfileDetails.hourlyRate}</div>
-                        <div>{ProfileDetails.dailyRate}</div>
-                    </Card.Body>
+                    <CardColumns>
+                        <Card.Title className="col d-flex justify-content-center">
+                            Profile Details
+                        </Card.Title>
+                        <Card.Header><div>Name  {ProfileDetails.postedBy.name}</div></Card.Header>
+                        <Card.Body style={{display:"flex", padding:"5%", marginRight:"10%"}}>
+                            
+                            <div>Email  {ProfileDetails.postedBy.email}</div>
+                            <div>Bio {ProfileDetails.bio}</div>
+                            <div>Job Title{ProfileDetails.jobTitle}</div>
+                            <div>Skills {ProfileDetails.skills}</div>
+                            <div>Location {ProfileDetails.location}</div>
+                            <div>Education {ProfileDetails.education}</div>
+                            <div>Services {ProfileDetails.services}</div>
+                            <div>Experience {ProfileDetails.experience}</div>
+                            <div>HourlyRate{ProfileDetails.hourlyRate}</div>
+                            <div>DailyRate {ProfileDetails.dailyRate}</div>
+                        </Card.Body>
+                    </CardColumns>
                 </Card>
-            </div>
+            </>
         );
     }
+    return (
+        <div>Error</div>
+    );
 }
 export default ViewProfile
